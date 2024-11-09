@@ -12,8 +12,8 @@ RF01 - TDAs: 0
 RF02 - TDA Player - constructor: 1
 RF03 - TDA Piece - constructor: 1
 RF04 - TDA Board - constructor: 1
-RF05 - TDA Board - otros - sePuedeJugar?: 0
-RF06 - TDA Board - modificador - jugar ficha: 0
+RF05 - TDA Board - otros - sePuedeJugar?: 1
+RF06 - TDA Board - modificador - jugar ficha: 1
 RF07 - TDA Board - otros - verificar victoria vertical: 0
 RF08 - TDA Board - otros - verificar victoria horizontal: 0
 RF09 - TDA Board - otros - verificar victoria diagonal: 0
