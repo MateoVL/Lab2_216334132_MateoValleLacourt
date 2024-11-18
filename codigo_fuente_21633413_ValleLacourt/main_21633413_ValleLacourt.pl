@@ -92,7 +92,6 @@ check_vertical_win([Tablero, P1, P2], Winner):-
     Winner is Acc + WinnerRec.
 
 
-
 /*
 RF08 TDA Board - otros - verificar victoria horizontal
 Descripcion: Predicado que permite verificar el estado actual del tablero y
@@ -111,4 +110,23 @@ check_horizontal_win([[Car|Cdr], P1, P2], Winner):-
     check_horizontal_win([Cdr,P1,P2], WinnerRec),
     Winner is Acc + WinnerRec.
 
-get_tablero([Tablero|_], Tablero).
+/*
+RF09 TDA Board - otros - verificar victoria diagonal
+Descripcion: Predicado que permite verificar el estado actual del tablero y
+entregar el posible ganador que cumple con la regla de conectar 4 fichas de
+forma diagonal.
+Recursividad: Si.
+Dominio: Board(board) X Winner(int)
+MP: check_horizontal_win/2.
+MS: cuatro_seguidos/4,
+    check_hoprizontal_win/2,
+    Winner is Acc + WinnerRec.
+*/
+check_diagonal_win([[_, _, _], _, _], 0).
+check_diagonal_win([[Car|Cdr], P1, P2], Winner):-
+    set_inv_filas([Car|Cdr], TableroInv),
+    verificar_fila_diagonal(TableroInv, P1, P2, AccIzq),
+    verificar_fila_diagonal([Car|Cdr], P1, P2, AccDer),
+    verificacion_DerIzq(AccIzq, AccDer, Acc),
+    check_diagonal_win([Cdr, P1, P2], WinnerRec),
+    Winner is WinnerRec + Acc.

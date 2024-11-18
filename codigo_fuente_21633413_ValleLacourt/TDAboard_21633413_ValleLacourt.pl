@@ -1,4 +1,4 @@
-:- module(tdaboard_21633413_vallelacourt, [board_with_players/4, get_elem_fila/3,get_fila/3,get_columna/3,set_pieza_fila/4,set_fila_board/4,fila_baja/2, cuatro_seguidos_fila/4, sacar_columna/3]).
+:- module(tdaboard_21633413_vallelacourt, [board_with_players/4, get_elem_fila/3,get_fila/3,get_columna/3,set_pieza_fila/4,set_fila_board/4,fila_baja/2, cuatro_seguidos_fila/4, sacar_columna/3, verificar_fila_diagonal/4, verificar_diagonal/4, set_inv_filas/2, verificacion_DerIzq/3]).
 :- use_module("TDAplayer_21633413_ValleLacourt").
 
 %Constructores:
@@ -94,6 +94,19 @@ set_fila_board([Car|Cdr], PosFila, Fila, [Car|CdrRec]):-
     set_fila_board(Cdr, PosFilaRec, Fila, CdrRec).
 
 
+/*
+Descripcion: Predicado que toma un tablero y aplica reverse a cada fila.
+Dominio: Tablero(lista de listas) X TableroInv(lista de listas)
+Recursividad: Si.
+MP: set_inv_filas/2.
+MS: reverse/2,
+    set_inv_filas/2.
+*/
+set_inv_filas([], []).
+set_inv_filas([Car|Cdr], [NewCar|NewCdr]):-
+    reverse(Car, NewCar),
+    set_inv_filas(Cdr, NewCdr).
+
 
 
 %OTROS:
@@ -161,3 +174,71 @@ MS: sacar_columna/3
 sacar_columna([], [], []).
 sacar_columna([[Elem0|RestoFila]|Filas],[Elem0|Columna0],[RestoFila|RestoFilas]):-
     sacar_columna(Filas, Columna0, RestoFilas).
+
+
+/*
+Descripcion: Predicado que dado un tablero y dos jugadores, transforma
+la diagonal principal de 4 caracteres de largo en una lista y verifica
+si hay cuatro fichas seguidas.
+Dominio: Tablero(lista de listas) X P1(player) X P2(player) X
+Winner(int)
+MP: verificar_digonal/4
+MS: get_fila/3,
+    get_elem_fila/3,
+    cuatro_seguidos_fila/4
+*/
+verificar_diagonal(Tablero, P1, P2, Winner):-
+    get_fila(Tablero, 0, Fila0),
+    get_elem_fila(Fila0, 0, Elem0),
+    get_fila(Tablero, 0, Fila1),
+    get_elem_fila(Fila1, 0, Elem1),
+    get_fila(Tablero, 0, Fila2),
+    get_elem_fila(Fila2, 0, Elem2),
+    get_fila(Tablero, 0, Fila3),
+    get_elem_fila(Fila3, 0, Elem3),
+    cuatro_seguidos_fila([Elem0, Elem1, Elem2, Elem3], P1, P2, Winner).
+
+
+/*
+Descripcion: Predicado que dado un tablero y dos jugadores, aplica la
+funcion verificar_diagonal a todos los elementos de la primera fila de
+un tablero.
+Dominio: Tablero(lista de listas) X P1(player) X P2(player)
+X Winner(int)
+Recursividad: Si.
+MP: verificar_fila_digonal/4
+MS: verificar_diagonal/4,
+    sacar_columna/3,
+    verificar_fila_digonal/4,
+    Winner is WinnerRec + Acc.
+*/
+verificar_fila_diagonal([[_, _, _]|_], _, _, 0).
+verificar_fila_diagonal(Tablero, P1, P2, Winner):-
+    verificar_diagonal(Tablero, P1, P2, Acc),
+    sacar_columna(Tablero, _, NewTablero),
+    verificar_fila_diagonal(NewTablero, P1, P2, WinnerRec),
+    Winner is WinnerRec + Acc.
+
+
+/*
+Descripcion: Predicado hecho para el caso de obtener una victoria
+diagonal hacia la derecha e izquierda al mismo tiempo, en vez de dar la
+suma, solo obtiene un ganador.
+Dominio: ResDiagonalIzq(int) X ResDiagonalDer(int) X Res(int)
+MP: verificacion_DerIzq/3
+MS:  Der > Izq,
+     Res = Der;
+     Der < Izq,
+     Res = Izq;
+     Der = Izq,
+     Res = Der.
+*/
+verificacion_DerIzq(Der, Izq, Res):-
+    Der > Izq,
+    Res = Der.
+verificacion_DerIzq(Der, Izq, Res):-
+    Der < Izq,
+    Res = Izq.
+verificacion_DerIzq(Der, Izq, Res):-
+    Der = Izq,
+    Res = Der.
