@@ -1,6 +1,5 @@
-:- use_module("TDAboard_21633413_ValleLacourt").
 :- use_module("TDAplayer_21633413_ValleLacourt").
-
+:- use_module("TDAboard_21633413_ValleLacourt").
 
 
 /*
@@ -85,12 +84,12 @@ MS: cuatro_seguidos/4,
     check_vertical_win/2,
     Winner is Acc + WinnerRec.
 */
-%check_vertical_win([[], _, _], 0).
-%check_vertical_win([[Car|Cdr], P1, P2], Winner):-
-%    get_columna([Car|Cdr], 0, Columna0),
-%    cuatro_seguidos(Columna0, P1, P2, Acc),
-%    check_vertical_win([Cdr,P1,P2], WinnerRec),
-%    Winner is Acc + WinnerRec.
+check_vertical_win([[[], [], [], [], [], []], _, _], 0).
+check_vertical_win([Tablero, P1, P2], Winner):-
+    sacar_columna(Tablero, Columna0, RestoTablero),
+    cuatro_seguidos_fila(Columna0, P1, P2, Acc),
+    check_vertical_win([RestoTablero,P1,P2], WinnerRec),
+    Winner is Acc + WinnerRec.
 
 
 
@@ -108,6 +107,8 @@ MS: cuatro_seguidos/4,
 */
 check_horizontal_win([[], _, _], 0).
 check_horizontal_win([[Car|Cdr], P1, P2], Winner):-
-    cuatro_seguidos(Car, P1, P2, Acc),
+    cuatro_seguidos_fila(Car, P1, P2, Acc),
     check_horizontal_win([Cdr,P1,P2], WinnerRec),
     Winner is Acc + WinnerRec.
+
+get_tablero([Tablero|_], Tablero).

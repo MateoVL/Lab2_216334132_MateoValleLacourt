@@ -1,15 +1,16 @@
-:- module(tdaboard_21633413_vallelacourt, [board_with_players/4, get_elem_fila/3,get_fila/3,get_columna/3,set_pieza_fila/4,set_fila_board/4,fila_baja/2, cuatro_seguidos_fila/4]).
+:- module(tdaboard_21633413_vallelacourt, [board_with_players/4, get_elem_fila/3,get_fila/3,get_columna/3,set_pieza_fila/4,set_fila_board/4,fila_baja/2, cuatro_seguidos_fila/4, sacar_columna/3]).
 :- use_module("TDAplayer_21633413_ValleLacourt").
 
 %Constructores:
 /*
 Descripcion: Predicado que construye un board dado un tablero y dos
 jugadores.
-Dominio: Fila(lista) X Pos(int) X Ficha(piece) X Board(board)
-MP: board_with_players.
+Dominio: Tablero(listade listas) X Player1(player) X Player2(player) X
+Board(board)
+MP: board_with_players/4
 MS:
 */
-board_with_players(Tablero, Player1, Player2, [Tablero, Player1, Player2]).
+board_with_players([Tablero|_], Player1, Player2, [Tablero, Player1, Player2]).
 
 
 
@@ -147,3 +148,16 @@ cuatro_seguidos_fila([_, _, _], _, _, 0).
 cuatro_seguidos_fila([_|Cdr], P1, P2, Winner):-
     cuatro_seguidos_fila(Cdr, P1, P2, Winner).
 
+
+/*
+Descripcion: Predicado que dado un tablero, calcula la primera columna
+como una lista, y deja el tablero sin la primera columna.
+Dominio: Tablero(lista de listas) X Columna0(lista) X
+TableroSinColumna0(lista de listas)
+Recursividad: Si.
+MP: sacar_columna/3
+MS: sacar_columna/3
+*/
+sacar_columna([], [], []).
+sacar_columna([[Elem0|RestoFila]|Filas],[Elem0|Columna0],[RestoFila|RestoFilas]):-
+    sacar_columna(Filas, Columna0, RestoFilas).
