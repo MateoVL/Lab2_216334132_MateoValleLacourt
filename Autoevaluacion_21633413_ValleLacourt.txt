@@ -8,7 +8,7 @@ RNF7. Historial: 1
 RNF8. Script de pruebas: 1
 RNF9. Prerrequisitos: 1
 
-RF01 - TDAs: 0
+RF01 - TDAs: 1
 RF02 - TDA Player - constructor: 1
 RF03 - TDA Piece - constructor: 1
 RF04 - TDA Board - constructor: 1
@@ -17,12 +17,12 @@ RF06 - TDA Board - modificador - jugar ficha: 1
 RF07 - TDA Board - otros - verificar victoria vertical: 1
 RF08 - TDA Board - otros - verificar victoria horizontal: 1
 RF09 - TDA Board - otros - verificar victoria diagonal: 1
-RF10 - TDA Board - otros - entregarGanador: 0
-RF11 - TDA Game - constructor: 0
-RF12 - TDA Game - otros - history: 0
-RF13 - TDA Game - otros - esEmpate?: 0
-RF14 - TDA Player - otros - actualizarEstadisticas: 0
-RF15 - TDA Game - selector - getCurrentPlayer: 0
-RF16 - TDA Game - selector - board-get-state: 0
-RF17 - TDA Game - modificador - game-set-end: 0
-RF18 - TDA Game - modificador - realizarMovimiento: 0
+RF10 - TDA Board - otros - entregarGanador: 1
+RF11 - TDA Game - constructor: 1
+RF12 - TDA Game - otros - history: 1
+RF13 - TDA Game - otros - esEmpate?: 1
+RF14 - TDA Player - otros - actualizarEstadisticas: 1
+RF15 - TDA Game - selector - getCurrentPlayer: 1
+RF16 - TDA Game - selector - board-get-state: 1
+RF17 - TDA Game - modificador - game-set-end: 1
+RF18 - TDA Game - modificador - realizarMovimiento: 1

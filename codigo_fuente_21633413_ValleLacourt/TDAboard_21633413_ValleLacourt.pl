@@ -1,5 +1,10 @@
-:- module(tdaboard_21633413_vallelacourt, [board_with_players/4, get_elem_fila/3,get_fila/3,get_columna/3,set_pieza_fila/4,set_fila_board/4,fila_baja/2, cuatro_seguidos_fila/4, sacar_columna/3, verificar_fila_diagonal/4, verificar_diagonal/4, set_inv_filas/2, verificacion_DerIzq/3]).
+:- module(tdaboard_21633413_vallelacourt, [board_with_players/4, get_elem_fila/3,get_fila/3,get_columna/3,set_pieza_fila/4,set_fila_board/4,fila_baja/2, cuatro_seguidos_fila/4, sacar_columna/3, verificar_fila_diagonal/4, verificar_diagonal/4, set_inv_filas/2, verificacion_DerIzq/3, verificacion_tipo_victoria/4]).
 :- use_module("TDAplayer_21633413_ValleLacourt").
+
+% TDA Board: Board es una lista con 3 elementos, una lista de listas
+% representando el tablero, y jugadores participantes del tablero,
+% siendo P1 y P2.
+
 
 %Constructores:
 /*
@@ -122,8 +127,8 @@ MS: member/2.
 */
 fila_baja([_, _, _, _, _, 0], 5).
 fila_baja([Car1,Car2|Cdr], 0):-
-    Car1 =:= 0,
-    Car2 =\= 0,
+    Car1 == 0,
+    Car2 \== 0,
     member(0, [Car1, Car2, Cdr]).
 fila_baja([_|Cdr], PosFila):-
     fila_baja(Cdr, Acc),
@@ -190,12 +195,12 @@ MS: get_fila/3,
 verificar_diagonal(Tablero, P1, P2, Winner):-
     get_fila(Tablero, 0, Fila0),
     get_elem_fila(Fila0, 0, Elem0),
-    get_fila(Tablero, 0, Fila1),
-    get_elem_fila(Fila1, 0, Elem1),
-    get_fila(Tablero, 0, Fila2),
-    get_elem_fila(Fila2, 0, Elem2),
-    get_fila(Tablero, 0, Fila3),
-    get_elem_fila(Fila3, 0, Elem3),
+    get_fila(Tablero, 1, Fila1),
+    get_elem_fila(Fila1, 1, Elem1),
+    get_fila(Tablero, 2, Fila2),
+    get_elem_fila(Fila2, 2, Elem2),
+    get_fila(Tablero, 3, Fila3),
+    get_elem_fila(Fila3, 3, Elem3),
     cuatro_seguidos_fila([Elem0, Elem1, Elem2, Elem3], P1, P2, Winner).
 
 
@@ -242,3 +247,33 @@ verificacion_DerIzq(Der, Izq, Res):-
 verificacion_DerIzq(Der, Izq, Res):-
     Der = Izq,
     Res = Der.
+
+
+/*
+Descripcion: Predicado hecho para el caso de obtener mas de un
+tipo de victoria al mismo tiempo, en ese caso solo tomara un
+caso de victoria.
+Dominio: WinnerV(int) X WinnerH(int) X WinnerD(int) X Winner(int)
+MP: verificacion_tipo_victoria/4
+MS:  WinnerV >= WinnerH,
+     WinnerV >= WinnerD,
+     Winner = WinnerV;
+     WinnerH >= WinnerV,
+     WinnerH >= WinnerD,
+     Winner = WinnerH;
+     WinnerD >= WinnerV,
+     WinnerD >= WinnerH,
+     Winner = WinnerD.
+*/
+verificacion_tipo_victoria(WinnerV, WinnerH, WinnerD, Winner):-
+    WinnerV >= WinnerH,
+    WinnerV >= WinnerD,
+    Winner = WinnerV.
+verificacion_tipo_victoria(WinnerV, WinnerH, WinnerD, Winner):-
+    WinnerH >= WinnerV,
+    WinnerH >= WinnerD,
+    Winner = WinnerH.
+verificacion_tipo_victoria(WinnerV, WinnerH, WinnerD, Winner):-
+    WinnerD >= WinnerV,
+    WinnerD >= WinnerH,
+    Winner = WinnerD.
