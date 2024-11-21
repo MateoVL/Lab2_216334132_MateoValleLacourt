@@ -49,7 +49,8 @@ MS: member/2.
 */
 can_play([Board|_]):-
     get_fila(Board, 0, Fila0),
-    member(0, Fila0).
+    member(0, Fila0),
+    !.
 
 
 /*
@@ -70,7 +71,8 @@ play_piece([Tablero, P1, P2], Column, Piece, NewBoard):-
     get_fila(Tablero, PosFila, Fila),
     set_pieza_fila(Fila, Column, Piece, NewFila),
     set_fila_board(Tablero, PosFila, NewFila, NewTablero),
-    board_with_players([NewTablero, _, _],P1, P2, NewBoard).
+    board_with_players([NewTablero, _, _],P1, P2, NewBoard),
+    !.
 
 
 /*
@@ -90,7 +92,8 @@ check_vertical_win([Tablero, P1, P2], Winner):-
     sacar_columna(Tablero, Columna0, RestoTablero),
     cuatro_seguidos_fila(Columna0, P1, P2, Acc),
     check_vertical_win([RestoTablero,P1,P2], WinnerRec),
-    Winner is Acc + WinnerRec.
+    Winner is Acc + WinnerRec,
+    !.
 
 
 /*
@@ -109,7 +112,8 @@ check_horizontal_win([[], _, _], 0).
 check_horizontal_win([[Car|Cdr], P1, P2], Winner):-
     cuatro_seguidos_fila(Car, P1, P2, Acc),
     check_horizontal_win([Cdr,P1,P2], WinnerRec),
-    Winner is Acc + WinnerRec.
+    Winner is Acc + WinnerRec,
+    !.
 
 /*
 RF09 TDA Board - otros - verificar victoria diagonal
@@ -130,7 +134,8 @@ check_diagonal_win([[Car|Cdr], P1, P2], Winner):-
     verificar_fila_diagonal([Car|Cdr], P1, P2, AccDer),
     verificacion_DerIzq(AccIzq, AccDer, Acc),
     check_diagonal_win([Cdr, P1, P2], WinnerRec),
-    Winner is WinnerRec + Acc.
+    Winner is WinnerRec + Acc,
+    !.
 
 
 /*
@@ -148,7 +153,8 @@ who_is_winner(Board, Winner):-
     check_vertical_win(Board, WinnerV),
     check_horizontal_win(Board, WinnerH),
     check_diagonal_win(Board, WinnerD),
-    verificacion_tipo_victoria(WinnerV, WinnerH, WinnerD, Winner).
+    verificacion_tipo_victoria(WinnerV, WinnerH, WinnerD, Winner),
+    !.
 
 
 /*
@@ -182,11 +188,13 @@ MP: is_draw/1
 MS:
 */
 is_draw([P1, P2, Board|_]):-
-    \+ can_play(Board);
+    \+ can_play(Board),
+    !;
     get_remaining_pieces(P1, Pieces1),
     get_remaining_pieces(P2, Pieces2),
     Pieces1 =:= 0,
-    Pieces2 =:= 0.
+    Pieces2 =:= 0,
+    !.
 
 
 /*
@@ -222,9 +230,11 @@ MS: Current_Turn =:= 1,
 */
 get_current_player([P1, P2, _, Current_Turn, _], Player):-
     Current_Turn =:= 1,
-    Player = P1;
+    Player = P1,
+    !;
     Current_Turn =:= 2,
-    Player = P2.
+    Player = P2,
+    !.
 
 
 /*
@@ -259,27 +269,30 @@ MS: who_is_winner/2,
     board_with_players/4,
     game_with_history/6.
 */
-end_game([P1, P2, Board, _, Historial], EndedGame):-
+end_game([P1, P2, Board, Current_Turn, Historial], EndedGame):-
     who_is_winner(Board, Winner),
     Winner =:= 1,
     update_stats(P1, "win", NewP1),
     update_stats(P2, "loss", NewP2),
     board_with_players(Board, NewP1, NewP2, NewBoard),
-    game_with_history(NewP1, NewP2, NewBoard, 0, Historial, EndedGame);
+    game_with_history(NewP1, NewP2, NewBoard, Current_Turn, Historial, EndedGame),
+    !;
 
     who_is_winner(Board, Winner),
     Winner =:= 2,
     update_stats(P1, "loss", NewP1),
     update_stats(P2, "winn", NewP2),
     board_with_players(Board, NewP1, NewP2, NewBoard),
-    game_with_history(NewP1, NewP2, NewBoard, 0, Historial, EndedGame);
+    game_with_history(NewP1, NewP2, NewBoard, Current_Turn, Historial, EndedGame),
+    !;
 
     who_is_winner(Board, Winner),
     Winner =:= 0,
     update_stats(P1, "draw", NewP1),
     update_stats(P2, "draw", NewP2),
     board_with_players(Board, NewP1, NewP2, NewBoard),
-    game_with_history(NewP1, NewP2, NewBoard, 0, Historial, EndedGame).
+    game_with_history(NewP1, NewP2, NewBoard, Current_Turn, Historial, EndedGame),
+    !.
 
 
 /*
@@ -304,19 +317,22 @@ player_play([P1, P2, Board, Current_Turn, History], Player, Column, NewGame):-
     get_board(JuegoJugado, NewBoard),
     who_is_winner(NewBoard, Winner),
     Winner =:= 1,
-    end_game(JuegoJugado, NewGame);
+    end_game(JuegoJugado, NewGame),
+    !;
     %Juega P1 y la partida sigue.
     comprobacion_P1(P1, Player, Board, Column, Current_Turn),
     jugada_P1([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
     get_board(JuegoJugado, NewBoard),
     who_is_winner(NewBoard, Winner),
     Winner =:= 0,
-    NewGame = JuegoJugado;
+    NewGame = JuegoJugado,
+    !;
     %Juega P1 y es empate.
     comprobacion_P1(P1, Player, Board, Column, Current_Turn),
     jugada_P1([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
     is_draw(JuegoJugado),
-    end_game(JuegoJugado, NewGame);
+    end_game(JuegoJugado, NewGame),
+    !;
 
     %Juega P2 y gana
     comprobacion_P2(P2, Player, Board, Column, Current_Turn),
@@ -324,38 +340,41 @@ player_play([P1, P2, Board, Current_Turn, History], Player, Column, NewGame):-
     get_board(JuegoJugado, NewBoard),
     who_is_winner(NewBoard, Winner),
     Winner =:= 2,
-    end_game(JuegoJugado, NewGame);
+    end_game(JuegoJugado, NewGame),
+    !;
     %Juega P2 y la partida sigue.
     comprobacion_P2(P2, Player, Board, Column, Current_Turn),
     jugada_P2([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
     get_board(JuegoJugado, NewBoard),
     who_is_winner(NewBoard, Winner),
     Winner =:= 0,
-    NewGame = JuegoJugado;
+    NewGame = JuegoJugado,
+    !;
     %Juega P2 y es empate
     comprobacion_P2(P2, Player, Board, Column, Current_Turn),
     jugada_P2([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
     is_draw(JuegoJugado),
-    end_game(JuegoJugado, NewGame);
-
-    %Caso de entregar un juego terminado.
-    Current_Turn =:= 0,
-    NewGame = [P1, P2, Board, Current_Turn, History];
+    end_game(JuegoJugado, NewGame),
+    !;
     %Caso Juega P1 en turno de P2
     Current_Turn =:= 2,
     get_id_player(P2, IdP2),
     get_id_player(Player, IdPlayer),
     IdP2 =\= IdPlayer,
-    NewGame = [P1, P2, Board, Current_Turn, History];
+    NewGame = [P1, P2, Board, Current_Turn, History],
+    !;
     %Caso Juega P2 en turno de P1
     Current_Turn =:= 1,
     get_id_player(P1, IdP1),
     get_id_player(Player, IdPlayer),
     IdP1 =\= IdPlayer,
     NewGame = [P1, P2, Board, Current_Turn, History],
+    !;
     %Caso Columna mala
     Column > -1,
-    NewGame = [P1, P2, Board, Current_Turn, History];
+    NewGame = [P1, P2, Board, Current_Turn, History],
+    !;
     %Caso Columna mala
     Column < 7,
-    NewGame = [P1, P2, Board, Current_Turn, History].
+    NewGame = [P1, P2, Board, Current_Turn, History],
+    !.
