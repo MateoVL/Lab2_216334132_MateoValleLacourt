@@ -1,9 +1,12 @@
 :- module(tdaboard_21633413_vallelacourt, [board_with_players/4, get_elem_fila/3,get_fila/3,get_columna/3,set_pieza_fila/4,set_fila_board/4,fila_baja/2, cuatro_seguidos_fila/4, sacar_columna/3, verificar_fila_diagonal/4, verificar_diagonal/4, set_inv_filas/2, verificacion_DerIzq/3, verificacion_tipo_victoria/4]).
 :- use_module("TDAplayer_21633413_ValleLacourt").
+:- use_module("TDApiece_21633413_ValleLacourt").
+
 
 % TDA Board: Board es una lista con 3 elementos, una lista de listas
 % representando el tablero, y jugadores participantes del tablero,
 % siendo P1 y P2.
+% board(tablero, jugador1, jugador2).
 
 
 %Constructores:
@@ -125,11 +128,11 @@ MP:fila_baja/2
 MS: member/2.
     fila_baja/2.
 */
-fila_baja([_, _, _, _, _, 0], 5).
+fila_baja([_, _, _, _, _, "0"], 5).
 fila_baja([Car1,Car2|Cdr], 0):-
-    Car1 == 0,
-    Car2 \== 0,
-    member(0, [Car1, Car2, Cdr]).
+    Car1 == "0",
+    Car2 \== "0",
+    member("0", [Car1, Car2, Cdr]).
 fila_baja([_|Cdr], PosFila):-
     fila_baja(Cdr, Acc),
     PosFila is Acc + 1.
@@ -152,13 +155,15 @@ MS: get_piece_player/2
 */
 cuatro_seguidos_fila([Primero, Segundo, Tercero, Cuarto|_], P1, _, 1):-
     get_piece_player(P1, Pieza),
-    Primero = Pieza,
+    get_ficha(Pieza, Ficha),
+    Primero = Ficha,
     Primero = Segundo,
     Primero = Tercero,
     Primero = Cuarto.
 cuatro_seguidos_fila([Primero, Segundo, Tercero, Cuarto|_], _, P2, 2):-
     get_piece_player(P2, Pieza),
-    Primero = Pieza,
+    get_ficha(Pieza, Ficha),
+    Primero = Ficha,
     Primero = Segundo,
     Primero = Tercero,
     Primero = Cuarto.

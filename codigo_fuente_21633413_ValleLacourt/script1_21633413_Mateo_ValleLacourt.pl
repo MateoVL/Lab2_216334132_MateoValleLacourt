@@ -58,16 +58,17 @@ player_play(G39, P2, 5, G40),
 player_play(G40, P1, 1, G41),
 player_play(G41, P2, 3, G42),
 player_play(G42, P1, 4, G43),
-player_play(G43, P2, 2, G44),
+player_play(G43, P2, 2, G44), %Empate y se termina el juego, actualizando estadisticas
 
 % Juan juega en columna 3 (victoria diagonal)
 % 6. Verificaciones del estado del juego
 write('¿Se puede jugar en el tablero vacío? '),
 can_play(TableroVacio), % Si se puede seguir jugando, el programa continuará
 nl,
+game_get_board(G12, Board12),
+write('¿Se puede jugar después de 12 movimientos? '),
+can_play(Board12),
 game_get_board(G44, CurrentBoard),
-write('¿Se puede jugar después de 44 movimientos? '),
-can_play(CurrentBoard),
 nl,
  write('Jugador actual después de 12 movimientos: '),
    get_current_player(G12, CurrentPlayer),
@@ -100,16 +101,14 @@ nl,
    is_draw(G44),
    nl,
 
-% 9. Finalizar juego y actualizar estadísticas
-   end_game(G44, EndedGame),
-
-% 10. Mostrar historial de movimientos
+% 9. Mostrar historial de movimientos
    write('Historial de movimientos: '),
-   game_history(EndedGame, History),
+   game_history(G44, History),
    write(History),
    nl,
 
-% 11. Mostrar estado final del tablero
+% 10. Mostrar estado final del tablero
    write('Estado final del tablero: '),
-   game_get_board(EndedGame, FinalBoard),
+   game_get_board(G44, FinalBoard),
    write(FinalBoard).
+

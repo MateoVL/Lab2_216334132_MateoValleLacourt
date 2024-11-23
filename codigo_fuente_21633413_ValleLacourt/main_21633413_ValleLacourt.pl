@@ -1,5 +1,6 @@
 :- module(main_21633413_vallelacourt, [player/8, piece/2, board/1, can_play/1, play_piece/4, check_vertical_win/2, check_horizontal_win/2, check_diagonal_win/2, who_is_winner/2, game/5, game_history/2, is_draw/1, update_stats/3, get_current_player/2, game_get_board/2, end_game/2, player_play/4]).
 :- use_module("TDAplayer_21633413_ValleLacourt").
+:- use_module("TDApiece_21633413_ValleLacourt").
 :- use_module("TDAboard_21633413_ValleLacourt").
 :- use_module("TDAgame_21633413_ValleLacourt").
 
@@ -12,7 +13,8 @@ Dominio: id (int) X name (string) X color (string) X wins (int) X losses
 MP: player/8.
 */
 player(Id, Name, Color, Wins, Losses, Draws, Remaining_pieces,
-       [Id, Name, Color, Wins, Losses, Draws, Remaining_pieces]).
+       [Id, Name, Piece, Wins, Losses, Draws, Remaining_pieces]):-
+    piece(Color, Piece).
 
 
 /*
@@ -21,7 +23,9 @@ Descripcion: Predicado que permite crear una ficha de conecta4.
 Dominio: color (string)
 MP: piece/2.
 */
-piece(Color, [Color]).
+piece(Color, [Color, Ficha]):-
+    string_chars(Color, [PrimerCaracter|_]),
+    string_chars(Ficha, ['(', PrimerCaracter, ')']).
 
 
 /*
@@ -30,12 +34,12 @@ Descripcion: Crear un tablero de conecta4.
 Dominio: sin parametros de entrada.
 MP: board/1.
 */
-board([[[0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0]],
+board([[["0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0"],
+        ["0", "0", "0", "0", "0", "0", "0"]],
         [],
         []]).
 
@@ -49,7 +53,7 @@ MS: member/2.
 */
 can_play([Board|_]):-
     get_fila(Board, 0, Fila0),
-    member(0, Fila0),
+    member("0", Fila0),
     !.
 
 
@@ -69,10 +73,10 @@ play_piece([Tablero, P1, P2], Column, Piece, NewBoard):-
     get_columna(Tablero, Column, ListColumn),
     fila_baja(ListColumn, PosFila),
     get_fila(Tablero, PosFila, Fila),
-    set_pieza_fila(Fila, Column, Piece, NewFila),
+    get_ficha(Piece, Ficha),
+    set_pieza_fila(Fila, Column, Ficha, NewFila),
     set_fila_board(Tablero, PosFila, NewFila, NewTablero),
-    board_with_players([NewTablero, _, _],P1, P2, NewBoard),
-    !.
+    board_with_players([NewTablero, _, _],P1, P2, NewBoard).
 
 
 /*
@@ -92,8 +96,7 @@ check_vertical_win([Tablero, P1, P2], Winner):-
     sacar_columna(Tablero, Columna0, RestoTablero),
     cuatro_seguidos_fila(Columna0, P1, P2, Acc),
     check_vertical_win([RestoTablero,P1,P2], WinnerRec),
-    Winner is Acc + WinnerRec,
-    !.
+    Winner is Acc + WinnerRec.
 
 
 /*
@@ -112,8 +115,7 @@ check_horizontal_win([[], _, _], 0).
 check_horizontal_win([[Car|Cdr], P1, P2], Winner):-
     cuatro_seguidos_fila(Car, P1, P2, Acc),
     check_horizontal_win([Cdr,P1,P2], WinnerRec),
-    Winner is Acc + WinnerRec,
-    !.
+    Winner is Acc + WinnerRec.
 
 /*
 RF09 TDA Board - otros - verificar victoria diagonal
@@ -239,23 +241,13 @@ get_current_player([P1, P2, _, Current_Turn, _], Player):-
 
 /*
 RF16 TDA Game - selector - board_get_state
-Descripcion: Predicado que entrega por pantalla el estado actual del tablero en el juego.
+Descripcion: Predicado que obtiene una representacion del
+tablero de un juego.
 Dominio: Game(game) X Board(board)
 MP: game_get_board/2
-MS: write(F1), nl,
-    write(F2), nl,
-    write(F3), nl,
-    write(F4), nl,
-    write(F5), nl,
-    write(F6), nl.
+MS:
 */
-game_get_board([_, _, [[F1, F2, F3, F4, F5, F6], P1, P2]|_], [[F1, F2, F3, F4, F5, F6], P1, P2]):-
-    write(F1), nl,
-    write(F2), nl,
-    write(F3), nl,
-    write(F4), nl,
-    write(F5), nl,
-    write(F6), nl.
+game_get_board([_,_, Tablero|_], Tablero).
 
 
 /*
@@ -281,7 +273,7 @@ end_game([P1, P2, Board, Current_Turn, Historial], EndedGame):-
     who_is_winner(Board, Winner),
     Winner =:= 2,
     update_stats(P1, "loss", NewP1),
-    update_stats(P2, "winn", NewP2),
+    update_stats(P2, "win", NewP2),
     board_with_players(Board, NewP1, NewP2, NewBoard),
     game_with_history(NewP1, NewP2, NewBoard, Current_Turn, Historial, EndedGame),
     !;
@@ -314,18 +306,10 @@ player_play([P1, P2, Board, Current_Turn, History], Player, Column, NewGame):-
     %Juega P1 y gana.
     comprobacion_P1(P1, Player, Board, Column, Current_Turn),
     jugada_P1([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
-    get_board(JuegoJugado, NewBoard),
+    game_get_board(JuegoJugado, NewBoard),
     who_is_winner(NewBoard, Winner),
     Winner =:= 1,
     end_game(JuegoJugado, NewGame),
-    !;
-    %Juega P1 y la partida sigue.
-    comprobacion_P1(P1, Player, Board, Column, Current_Turn),
-    jugada_P1([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
-    get_board(JuegoJugado, NewBoard),
-    who_is_winner(NewBoard, Winner),
-    Winner =:= 0,
-    NewGame = JuegoJugado,
     !;
     %Juega P1 y es empate.
     comprobacion_P1(P1, Player, Board, Column, Current_Turn),
@@ -333,22 +317,22 @@ player_play([P1, P2, Board, Current_Turn, History], Player, Column, NewGame):-
     is_draw(JuegoJugado),
     end_game(JuegoJugado, NewGame),
     !;
+    %Juega P1 y la partida sigue.
+    comprobacion_P1(P1, Player, Board, Column, Current_Turn),
+    jugada_P1([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
+    game_get_board(JuegoJugado, NewBoard),
+    who_is_winner(NewBoard, Winner),
+    Winner =:= 0,
+    NewGame = JuegoJugado,
+    !;
 
     %Juega P2 y gana
     comprobacion_P2(P2, Player, Board, Column, Current_Turn),
     jugada_P2([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
-    get_board(JuegoJugado, NewBoard),
+    game_get_board(JuegoJugado, NewBoard),
     who_is_winner(NewBoard, Winner),
     Winner =:= 2,
     end_game(JuegoJugado, NewGame),
-    !;
-    %Juega P2 y la partida sigue.
-    comprobacion_P2(P2, Player, Board, Column, Current_Turn),
-    jugada_P2([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
-    get_board(JuegoJugado, NewBoard),
-    who_is_winner(NewBoard, Winner),
-    Winner =:= 0,
-    NewGame = JuegoJugado,
     !;
     %Juega P2 y es empate
     comprobacion_P2(P2, Player, Board, Column, Current_Turn),
@@ -356,6 +340,15 @@ player_play([P1, P2, Board, Current_Turn, History], Player, Column, NewGame):-
     is_draw(JuegoJugado),
     end_game(JuegoJugado, NewGame),
     !;
+    %Juega P2 y la partida sigue.
+    comprobacion_P2(P2, Player, Board, Column, Current_Turn),
+    jugada_P2([P1, P2, Board, Current_Turn, History], Column, JuegoJugado),
+    game_get_board(JuegoJugado, NewBoard),
+    who_is_winner(NewBoard, Winner),
+    Winner =:= 0,
+    NewGame = JuegoJugado,
+    !;
+
     %Caso Juega P1 en turno de P2
     Current_Turn =:= 2,
     get_id_player(P2, IdP2),
@@ -370,6 +363,7 @@ player_play([P1, P2, Board, Current_Turn, History], Player, Column, NewGame):-
     IdP1 =\= IdPlayer,
     NewGame = [P1, P2, Board, Current_Turn, History],
     !;
+
     %Caso Columna mala
     Column > -1,
     NewGame = [P1, P2, Board, Current_Turn, History],
