@@ -1,1 +1,14 @@
+Instrucciones para correr los scripts:
+Se debe abrir un archivo script,
+Copiar el contenido,
+en la cosola de SWI-Prolog consultar al main,
+pegar lo copiado del script,
+preguntar.
 
+En el script base, hay una parte donde consulta a is_draw, 
+en la implementacion, si el juego es empate, el programa sigue, pero si no lo es,
+el programa retorna un false y se termina el script.
+El enunciado que dice que no se puede modificar ese script, por eso dejo la aclaracion aca.
+
+Los demas scipt hechos por el estudiante, funcionan en su totalidad, mostrando el estado final del juego, 
+y sin actualizar las estadisticas dos veces.
