@@ -1,8 +1,7 @@
 Instrucciones para correr los scripts:
-Se debe abrir un archivo script,
-Copiar el contenido,
-en la cosola de SWI-Prolog consultar al main,
-pegar lo copiado del script,
+En la cosola de SWI-Prolog consultar al main,
+abrir un archivo script y copiar el contenido,
+pegar lo copiado del script en la consola,
 preguntar.
 
 En el script base, hay una parte donde consulta a is_draw, 
